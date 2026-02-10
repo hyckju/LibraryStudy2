@@ -1,57 +1,68 @@
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class LibraryManager {
-    private Map<Integer, Book> bookMap = new HashMap<>();
-    private List<User> userList = new ArrayList<>();
-    private User currentUser;
-    private final LibraryRepository libraryRepository;
+    private Map<Integer, Book> bookMap;
+    private Map<String, User> userMap;
+    private User currentUser = null;
+    private LibraryRepository repository;
+    private int bookCount;
 
-    public LibraryManager(LibraryRepository libraryRepository) {
-        this.libraryRepository = libraryRepository;
-        this.initialize();
+    public LibraryManager(LibraryRepository repository) {
+        this.repository = repository;
+        this.bookMap = repository.loadBookData();
+        this.userMap = repository.loadUserData();
+        this.bookCount = bookMap.keySet().stream().max(Integer::compare).orElse(0);
     }
 
-    public void initialize() {
-        this.bookMap = this.libraryRepository.getBookMap();
-        this.userList = this.libraryRepository.loadUsers();
-    }
-
-    public boolean login(String id, String password) {
-        for(User user : this.userList) {
-            if (user.getId().equals(id) && user.getPassword().equals(password)) {
-                this.currentUser = user;
-                return true;
-            }
+    public boolean login(String id, String pw) {
+        if (userMap.containsKey(id) && userMap.get(id).getPassword().equals(pw)) {
+            currentUser = userMap.get(id);
+            return true;
         }
-
         return false;
     }
 
     public void addBook(String title, String author) {
-        int newId = this.libraryRepository.getBookCount() + 1;
-        Book newBook = new Book(newId, title, author, true);
-        this.libraryRepository.getBookMap().put(newId, newBook);
+        int id = ++bookCount;
+        bookMap.put(id, new Book(id, title, author, true, null));
     }
 
-    public void editBook(int id, String title, String author) {
-        Map<Integer, Book> books = this.libraryRepository.getBookMap();
-        if (books.containsKey(id)) {
-            ((Book)books.get(id)).updateBook(title, author);
+    public boolean editBook(int id, String title, String author) {
+        if (bookMap.containsKey(id)) {
+            bookMap.get(id).updateBook(title, author);
+            return true;
         }
+        return false;
     }
 
     public boolean deleteBook(int id) {
-        return this.libraryRepository.getBookMap().remove(id) != null;
+        return bookMap.remove(id) != null;
+    }
+
+    public boolean borrowBook(int id) {
+        Book b = bookMap.get(id);
+        if (b != null && b.isAvailable()) {
+            b.setAvailable(false);
+            b.setBorrowerId(currentUser.getUserId());
+            return true;
+        }
+        return false;
+    }
+
+    public boolean returnBook(int id) {
+        Book b = bookMap.get(id);
+        if (b != null && !b.isAvailable()) {
+            b.setAvailable(true);
+            b.setBorrowerId(null);
+            return true;
+        }
+        return false;
     }
 
     public void saveChanges() {
-        this.libraryRepository.saveBooks((HashMap)this.bookMap);
+        repository.saveChanges(bookMap, userMap);
     }
 
-    public User getCurrentUser() {
-        return this.currentUser;
-    }
+    public Map<Integer, Book> getBookMap() { return bookMap; }
+    public User getCurrentUser() { return currentUser; }
 }
