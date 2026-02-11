@@ -38,14 +38,10 @@ public class Main {
             System.out.println("           [ 관리자 전용 메뉴]            ");
             System.out.println("=======================================");
             System.out.println("""
-                    1. 도서 등록\
-                    
-                    2. 도서 수정 및 삭제\
-                    
-                    3. 전체 도서 목록\
-                    
-                    4. 도서 검색\
-                    
+                    1. 도서 등록
+                    2. 도서 수정 및 삭제
+                    3. 전체 도서 목록
+                    4. 도서 검색
                     0. 종료""");
             System.out.println("----------------------------------------");
             System.out.print("명령 입력 : ");
@@ -126,11 +122,12 @@ public class Main {
             System.out.println("\n=======================================");
             System.out.println("           [ 일반 사용자 메뉴 ]            ");
             System.out.println("=======================================");
-            System.out.println("1. 도서 대출");
-            System.out.println("2. 도서 반납");
-            System.out.println("3. 내 현황 보기");
-            System.out.println("4. 전체 도서 목록");
-            System.out.println("0. 종료");
+            System.out.println("""
+                    1. 도서 대출
+                    2. 도서 반납
+                    3. 내 현황 보기
+                    4. 전체 도서 목록
+                    0. 종료""");
             System.out.println("----------------------------------------");
             System.out.print("선택: ");
             String choice = sc.nextLine();

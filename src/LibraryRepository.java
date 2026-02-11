@@ -17,7 +17,7 @@ public class LibraryRepository {
                 int id = Integer.parseInt(d[0]);
                 books.put(id, new Book(id, d[1], d[2], Boolean.parseBoolean(d[3]), d[4].isEmpty() ? null : d[4]));
             }
-        } catch (IOException e) { e.printStackTrace(); }
+        } catch (IOException e) {}
         return books;
     }
 
@@ -35,7 +35,7 @@ public class LibraryRepository {
                 String[] d = line.split(",", -1);
                 users.put(d[0], new User(d[0], d[1], d[2]));
             }
-        } catch (IOException e) { e.printStackTrace(); }
+        } catch (IOException e) {}
         return users;
     }
 
@@ -48,6 +48,6 @@ public class LibraryRepository {
             for (User u : users.values()) {
                 pwU.printf("%s,%s,%s%n", u.getUserId(), u.getPassword(), u.getRole());
             }
-        } catch (IOException e) { e.printStackTrace(); }
+        } catch (IOException e) {}
     }
 }
