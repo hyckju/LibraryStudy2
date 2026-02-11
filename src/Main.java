@@ -1,7 +1,7 @@
 import java.util.Scanner;
 
 public class Main {
-    private static Scanner sc = new Scanner(System.in);
+    private static final Scanner sc = new Scanner(System.in);
     private static LibraryManager manager;
 
     public static void main(String[] args) {
@@ -83,17 +83,21 @@ public class Main {
                         System.out.println("  1. 제목 수정  2. 저자 수정  3. 도서 삭제  0. 취소");
                         System.out.print("  선택: ");
                         String sub = sc.nextLine();
-                        if (sub.equals("1")) {
-                            System.out.print("- 새 제목 입력: ");
-                            b.updateBook(sc.nextLine(), b.getAuthor());
-                            System.out.println("[결과] 수정이 완료되었습니다.");
-                        } else if (sub.equals("2")) {
-                            System.out.print("- 새 저자 입력: ");
-                            b.updateBook(b.getTitle(), sc.nextLine());
-                            System.out.println("[결과] 수정이 완료되었습니다.");
-                        } else if (sub.equals("3")) {
-                            manager.getBookMap().remove(id);
-                            System.out.println("[결과] 해당 도서가 삭제되었습니다.");
+                        switch (sub) {
+                            case "1" -> {
+                                System.out.print("- 새 제목 입력: ");
+                                b.updateBook(sc.nextLine(), b.getAuthor());
+                                System.out.println("[결과] 수정이 완료되었습니다.");
+                            }
+                            case "2" -> {
+                                System.out.print("- 새 저자 입력: ");
+                                b.updateBook(b.getTitle(), sc.nextLine());
+                                System.out.println("[결과] 수정이 완료되었습니다.");
+                            }
+                            case "3" -> {
+                                manager.getBookMap().remove(id);
+                                System.out.println("[결과] 해당 도서가 삭제되었습니다.");
+                            }
                         }
                     }
                     break;
@@ -160,9 +164,7 @@ public class Main {
                             .forEach(book -> System.out.printf("%d | %s | %s\n", book.getId(), book.getTitle(), book.getAuthor()));
                     break;
                 case "4":
-                    manager.getBookMap().forEach((idx, book) -> {
-                        System.out.printf("%d | %s | %s | %s\n", idx, book.getTitle(), book.getAuthor(), book.isAvailable() ? "대출가능" : "대출중");
-                    });
+                    manager.getBookMap().forEach((idx, book) -> System.out.printf("%d | %s | %s | %s\n", idx, book.getTitle(), book.getAuthor(), book.isAvailable() ? "대출가능" : "대출중"));
                     break;
             }
         }

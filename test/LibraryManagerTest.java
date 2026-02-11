@@ -4,11 +4,10 @@ import static org.junit.jupiter.api.Assertions.*;
 
 class LibraryManagerTest {
     private LibraryManager manager;
-    private LibraryRepository repository;
 
     @BeforeEach
     void setUp() {
-        repository = new LibraryRepository(); // 실제 파일 대신 Mock을 쓸 수도 있지만, 여기선 기본 환경 사용
+        LibraryRepository repository = new LibraryRepository(); // 실제 파일 대신 Mock을 쓸 수도 있지만, 여기선 기본 환경 사용
         manager = new LibraryManager(repository);
     }
 
