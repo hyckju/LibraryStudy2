@@ -3,18 +3,14 @@ import java.sql.*;
 import java.util.*;
 
 public class LibraryRepository {
-    // DB 연결 정보 (본인의 DB 정보에 맞게 수정하세요)
-    private final String URL = "jdbc:mariadb://localhost:3306/library_db";
-    private final String USER = "root";
-    private final String PASS = "did0125"; // 본인이 설정한 비밀번호
     // MariaDB에서 도서 목록 불러오기
     public Map<Integer, Book> loadBookData() {
         Map<Integer, Book> books = new HashMap<>();
         String sql = "SELECT * FROM books";
 
-        try (Connection conn = DriverManager.getConnection(URL, USER, PASS);
-             Statement stmt = conn.createStatement();
-             ResultSet rs = stmt.executeQuery(sql)) {
+        try (Connection conn = DBconn.getConnection();
+             PreparedStatement pstmt = conn.prepareStatement(sql);
+             ResultSet rs = pstmt.executeQuery()) {
 
             while (rs.next()) {
                 int id = rs.getInt("id");
@@ -36,9 +32,9 @@ public class LibraryRepository {
         Map<String, User> users = new HashMap<>();
         String sql = "SELECT * FROM users";
 
-        try (Connection conn = DriverManager.getConnection(URL, USER, PASS);
-             Statement stmt = conn.createStatement();
-             ResultSet rs = stmt.executeQuery(sql)) {
+        try (Connection conn = DBconn.getConnection();
+             PreparedStatement pstmt = conn.prepareStatement(sql);
+             ResultSet rs = pstmt.executeQuery()) {
 
             while (rs.next()) {
                 String userId = rs.getString("user_id");
@@ -57,25 +53,30 @@ public class LibraryRepository {
                 "VALUES (?, ?, ?, ?, ?) " +
                 "ON DUPLICATE KEY UPDATE title=?, author=?, available=?, borrower_id=?";
 
-        try (Connection conn = DriverManager.getConnection(URL, USER, PASS);
-             PreparedStatement pstmt = conn.prepareStatement(sql)) {
-
-            for (Book b : books.values()) {
-                pstmt.setInt(1, b.getId());
-                pstmt.setString(2, b.getTitle());
-                pstmt.setString(3, b.getAuthor());
-                pstmt.setBoolean(4, b.isAvailable());
-                pstmt.setString(5, b.getBorrowerId());
-                // 업데이트 부분
-                pstmt.setString(6, b.getTitle());
-                pstmt.setString(7, b.getAuthor());
-                pstmt.setBoolean(8, b.isAvailable());
-                pstmt.setString(9, b.getBorrowerId());
-                pstmt.addBatch();
+        try (Connection conn = DBconn.getConnection()) {
+             conn.setAutoCommit(false);
+             try (PreparedStatement pstmt = conn.prepareStatement(sql)) {
+                for (Book b : books.values()) {
+                    pstmt.setInt(1, b.getId());
+                    pstmt.setString(2, b.getTitle());
+                    pstmt.setString(3, b.getAuthor());
+                    pstmt.setBoolean(4, b.isAvailable());
+                    pstmt.setString(5, b.getBorrowerId());
+                    // 업데이트 부분
+                    pstmt.setString(6, b.getTitle());
+                    pstmt.setString(7, b.getAuthor());
+                    pstmt.setBoolean(8, b.isAvailable());
+                    pstmt.setString(9, b.getBorrowerId());
+                    pstmt.addBatch();
+                }
+                pstmt.executeBatch();
+                conn.commit();
+                System.out.println(" => 데이터베이스 저장 완료.");
+            } catch (SQLException e) {
+                conn.rollback();
+                throw e;
             }
-            pstmt.executeBatch();
-            System.out.println(" => 데이터베이스 저장 완료.");
-        } catch (SQLException e) {
+        } catch (SQLException e){
             e.printStackTrace();
         }
     }

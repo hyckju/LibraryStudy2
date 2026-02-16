@@ -58,7 +58,7 @@ public class LibraryManager {
         }
         return false;
     }
-
+    // 내부적으로 DBconn을 쓰는 Repository를 호출함
     public void saveChanges() {
         repository.saveChanges(bookMap, userMap);
     }
